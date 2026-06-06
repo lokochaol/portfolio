@@ -44,7 +44,7 @@ export default function Projects() {
           className="mb-16"
         >
           <span className="font-mono text-xs tracking-widest text-white/30 uppercase">03 / Projects</span>
-          <h2 className="text-4xl font-bold text-white mt-4">制作物</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-4">制作物</h2>
         </motion.div>
 
         <div className="space-y-4">
@@ -58,8 +58,8 @@ export default function Projects() {
               className="group block border border-white/10 rounded-xl p-6 hover:border-white/30 hover:bg-white/[0.03] transition-all duration-300 cursor-pointer"
               data-cursor="hover"
             >
-              <div className="flex items-start justify-between gap-6">
-                <div className="flex gap-6 items-start">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex gap-4 items-start min-w-0">
                   <span className="font-mono text-xs text-white/20 mt-1 shrink-0">{number}</span>
                   <div>
                     <h3 className="text-lg font-semibold text-white group-hover:text-white/90 transition-colors mb-2">

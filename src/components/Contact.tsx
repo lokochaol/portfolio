@@ -27,13 +27,13 @@ export default function Contact() {
           className="mb-16"
         >
           <span className="font-mono text-xs tracking-widest text-white/30 uppercase">04 / Contact</span>
-          <h2 className="text-4xl font-bold text-white mt-4 mb-4">連絡先</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-4 mb-4">連絡先</h2>
           <p className="text-white/40 text-sm">
             お仕事のご依頼・ご相談はお気軽にどうぞ。
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-4 max-w-xl">
+        <div className="grid sm:grid-cols-2 gap-4 max-w-xl">
           {links.map(({ label, href, mono }, i) => (
             <motion.a
               key={label}
