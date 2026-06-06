@@ -20,9 +20,9 @@ export default function About() {
         >
           <span className="font-mono text-xs tracking-widest text-white/30 uppercase">01 / About</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mt-4 mb-6 leading-tight">
-            API を設計し、<br />
-            <span className="text-white/30">画面を作り、</span><br />
-            インフラも触る。
+            誰より深く聞いて、<br />
+            <span className="text-white/30">誰より丁寧に</span><br />
+            形にする。
           </h2>
           <p className="text-white/50 leading-8 text-sm">
             Django / DRF による REST API 設計・実装が主戦場。
