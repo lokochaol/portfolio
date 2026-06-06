@@ -50,10 +50,10 @@ export default function Skills() {
           className="mb-16"
         >
           <span className="font-mono text-xs tracking-widest text-white/30 uppercase">02 / Skills</span>
-          <h2 className="text-4xl font-bold text-white mt-4">技術スタック</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-4">技術スタック</h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-10">
           {skills.map(({ category, items }, ci) => (
             <motion.div
               key={category}

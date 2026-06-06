@@ -1,99 +1,100 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-const LINES = [
-  "$ whoami",
-  "> Full-Stack Engineer",
-  "$ skills --list",
-  "> Python · Django · FastAPI",
-  "> React · Next.js · Flutter",
-  "$ open portfolio.sh",
-  "> Welcome.",
-];
+const TECHS = ["Python", "Django", "FastAPI", "React", "Flutter", "AWS"];
 
 export default function Hero() {
-  const [displayedLines, setDisplayedLines] = useState<string[]>([]);
-  const [currentLine, setCurrentLine] = useState(0);
-  const [currentChar, setCurrentChar] = useState(0);
-  const [done, setDone] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (currentLine >= LINES.length) {
-      setDone(true);
-      return;
-    }
-    const line = LINES[currentLine];
-    if (currentChar < line.length) {
-      timeoutRef.current = setTimeout(() => {
-        setDisplayedLines((prev) => {
-          const next = [...prev];
-          next[currentLine] = (next[currentLine] || "") + line[currentChar];
-          return next;
-        });
-        setCurrentChar((c) => c + 1);
-      }, currentChar === 0 ? 300 : 28);
-    } else {
-      timeoutRef.current = setTimeout(() => {
-        setCurrentLine((l) => l + 1);
-        setCurrentChar(0);
-      }, 400);
-    }
-    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
-  }, [currentLine, currentChar]);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [6, -6]), {
+    stiffness: 80,
+    damping: 25,
+  });
+  const rotateY = useSpring(useTransform(mouseX, [-600, 600], [-6, 6]), {
+    stiffness: 80,
+    damping: 25,
+  });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    mouseX.set(e.clientX - rect.left - rect.width / 2);
+    mouseY.set(e.clientY - rect.top - rect.height / 2);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   return (
-    <section className="min-h-screen flex flex-col justify-center px-6 max-w-5xl mx-auto">
+    <section
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="min-h-screen flex flex-col justify-center px-6 py-24 max-w-5xl mx-auto relative"
+      style={{ perspective: "1200px" }}
+    >
+      <motion.div
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="w-full select-none"
+      >
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="font-mono text-xs tracking-widest text-white/30 uppercase mb-8"
+        >
+          Backend Engineer · Full-Stack
+        </motion.p>
+
+        <div className="overflow-hidden">
+          <motion.h1
+            initial={{ y: "110%" }}
+            animate={{ y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[clamp(3.5rem,11vw,8.5rem)] font-bold tracking-tight text-white leading-none"
+          >
+            廣岡
+          </motion.h1>
+        </div>
+        <div className="overflow-hidden">
+          <motion.h1
+            initial={{ y: "110%" }}
+            animate={{ y: 0 }}
+            transition={{ duration: 1, delay: 0.07, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[clamp(3.5rem,11vw,8.5rem)] font-bold tracking-tight text-white/20 leading-none"
+          >
+            晃一
+          </motion.h1>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mt-10 flex flex-wrap gap-x-6 gap-y-2"
+        >
+          {TECHS.map((tech) => (
+            <span
+              key={tech}
+              className="font-mono text-sm text-white/25 hover:text-white/80 transition-colors duration-300 cursor-default"
+            >
+              {tech}
+            </span>
+          ))}
+        </motion.div>
+      </motion.div>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="space-y-1"
-      >
-        <div className="font-mono text-sm bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg p-6 inline-block min-w-[360px]">
-          {displayedLines.map((line, i) => (
-            <div
-              key={i}
-              className={`${
-                line.startsWith("$")
-                  ? "text-white/50"
-                  : "text-white"
-              } leading-7`}
-            >
-              {line}
-              {i === currentLine && !done && (
-                <span className="animate-pulse">▌</span>
-              )}
-            </div>
-          ))}
-          {done && <span className="animate-pulse text-white/50">▌</span>}
-        </div>
-      </motion.div>
-
-      {done && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mt-12 space-y-2"
-        >
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
-            Backend<br />
-            <span className="text-white/20">+</span> Everything.
-          </h1>
-          <p className="text-white/40 text-lg mt-4 font-light max-w-md">
-            Python · Django · FastAPI をコアに、<br />
-            フロント・モバイル・デザインまで一気通貫で作る。
-          </p>
-        </motion.div>
-      )}
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: done ? 1 : 0 }}
-        transition={{ duration: 1, delay: 0.8 }}
+        transition={{ duration: 1, delay: 0.9 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2"
       >
         <div className="flex flex-col items-center gap-2 text-white/20 font-mono text-xs tracking-widest">
