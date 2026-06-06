@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-const TECHS = ["Python", "Django", "FastAPI", "React", "Flutter", "AWS"];
+const TECHS = ["Python", "Django", "DRF", "React", "Flutter", "AWS", "Docker"];
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);

@@ -20,14 +20,16 @@ export default function About() {
         >
           <span className="font-mono text-xs tracking-widest text-white/30 uppercase">01 / About</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mt-4 mb-6 leading-tight">
-            コードを書くことが<br />
-            <span className="text-white/30">思考することと</span><br />
-            同義な人間。
+            世界一よく聞いて<br />
+            <span className="text-white/30">あなたの想像を</span><br />
+            形にします。
           </h2>
           <p className="text-white/50 leading-8 text-sm">
-            バックエンドをメインフィールドとしながら、フロントエンド・モバイルアプリ・UIデザインまで手掛けるフルサイクルエンジニア。
-            Python / Django / FastAPI でサービスの土台を設計し、React や Flutter でユーザーが触れる部分まで一貫して実装する。
-            「作れる」だけでなく「設計できる」エンジニアを目指している。
+            Django / DRF による REST API 設計・実装が主戦場。
+            OCR パイプラインや帳票出力エンジン、Amazon Connect 連携など、
+            複雑な業務ロジックをゼロから実装してきた。
+            チームリーダーとして技術方針の策定・コードレビュー・納期管理も経験。
+            フロントエンドからモバイル・インフラまで、必要なら全部やる。
           </p>
         </motion.div>
 
@@ -38,11 +40,11 @@ export default function About() {
           className="space-y-3"
         >
           {[
-            { label: "Backend", value: "Python · Django · FastAPI · PostgreSQL" },
-            { label: "Frontend", value: "React · Next.js · TypeScript · Tailwind" },
-            { label: "Mobile", value: "Flutter · Dart" },
-            { label: "Design", value: "Figma · UI/UX Design" },
-            { label: "Infra", value: "Docker · Linux · Git" },
+            { label: "Backend", value: "Python · Django · DRF · PostgreSQL" },
+            { label: "Infra", value: "AWS EC2/ECS/Lambda · GCP GCS · Docker · Ubuntu" },
+            { label: "Frontend", value: "React · Vue.js · Next.js · TypeScript" },
+            { label: "Mobile", value: "Flutter · iOS · Android" },
+            { label: "Tools", value: "GitHub Actions · pytest · openpyxl · ReportLab" },
           ].map(({ label, value }, i) => (
             <motion.div
               key={label}
