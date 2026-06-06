@@ -2,6 +2,7 @@ import ParticleBackground from "@/components/ParticleBackground";
 import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Profile from "@/components/Profile";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
@@ -14,6 +15,7 @@ export default function Page() {
       <CustomCursor />
       <Navbar />
       <Hero />
+      <Profile />
       <About />
       <Skills />
       <Projects />
