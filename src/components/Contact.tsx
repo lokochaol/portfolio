@@ -4,9 +4,8 @@ import { motion } from "framer-motion";
 import { useScrollReveal } from "./useScrollReveal";
 
 const links = [
-  { label: "GitHub", href: "https://github.com/", mono: "github.com" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/", mono: "linkedin.com" },
-  { label: "note", href: "https://note.com/", mono: "note.com" },
+  { label: "GitHub", href: "https://github.com/lokochaol", mono: "github.com/lokochaol" },
+  { label: "note", href: "https://note.com/l_00_kocha_00_l", mono: "note.com/l_00_kocha_00_l" },
   { label: "Email", href: "mailto:l.00.kocha.00.l@gmail.com", mono: "l.00.kocha.00.l@gmail.com" },
 ];
 
