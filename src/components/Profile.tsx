@@ -65,8 +65,7 @@ const TIMELINE: Entry[] = [
     period: "2025.04",
     type: "work",
     title: "ITクラウドインフラ",
-    desc: "GPUベアメタルサーバー貸し出し管理・自動化システム開発。CI/CD・インフラ構築。",
-    current: true,
+    desc: "GPUベアメタルサーバー貸し出し管理・自動化システム開発。CI/CD・インフラ構築。（〜2025.08）",
   },
 ];
 
