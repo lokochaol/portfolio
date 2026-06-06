@@ -65,8 +65,7 @@ const TIMELINE: Entry[] = [
     period: "2025.04",
     type: "work",
     title: "ITクラウドインフラ",
-    desc: "GPUベアメタルサーバー貸し出し管理・自動化システム開発。CI/CD・インフラ構築。",
-    current: true,
+    desc: "GPUベアメタルサーバー貸し出し管理・自動化システム開発。CI/CD・インフラ構築。（〜2025.08）",
   },
 ];
 
@@ -96,9 +95,9 @@ export default function Profile() {
           </div>
           <p className="mt-6 text-white/50 text-sm leading-8 max-w-2xl">
             バックエンド開発（Python / Django / DRF）を中心に、インフラ（AWS / GCP）、
-            フロントエンド（React / Vue.js）、モバイル（iOS / Android）まで幅広く対応するフルスタックエンジニア。
-            RESTful APIの設計から実装・テスト・ドキュメント作成まで一貫して担当。
-            テックリードとして技術方針策定・コードレビュー・進捗報告も経験。
+            フロントエンド（React / Vue.js）、モバイル（iOS / Android）まで幅広く対応するフルスタックエンジニアです。
+            RESTful APIの設計から実装・テスト・ドキュメント作成まで一貫して担当しています。
+            テックリードとして技術方針策定・コードレビュー・進捗報告も経験しています。
           </p>
         </motion.div>
 
