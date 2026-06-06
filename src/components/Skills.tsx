@@ -3,16 +3,16 @@
 import { motion } from "framer-motion";
 import { useScrollReveal } from "./useScrollReveal";
 
-const skills = [
-  {
-    category: "Backend",
-    items: [
-      { name: "Python", level: 95 },
-      { name: "Django / DRF", level: 90 },
-      { name: "PostgreSQL", level: 80 },
-      { name: "GitHub Actions", level: 75 },
-    ],
-  },
+type LangItem = { name: string; level: number };
+
+const FALLBACK_LANGS: LangItem[] = [
+  { name: "Python", level: 95 },
+  { name: "Django / DRF", level: 90 },
+  { name: "PostgreSQL", level: 80 },
+  { name: "GitHub Actions", level: 75 },
+];
+
+const MANUAL_CATEGORIES = [
   {
     category: "Infra / Cloud",
     items: [
@@ -33,8 +33,20 @@ const skills = [
   },
 ];
 
-export default function Skills() {
+type Props = {
+  githubLanguages?: LangItem[];
+};
+
+export default function Skills({ githubLanguages }: Props) {
   const { ref, visible } = useScrollReveal();
+
+  const langItems =
+    githubLanguages && githubLanguages.length > 0 ? githubLanguages : FALLBACK_LANGS;
+
+  const skills = [
+    { category: "Languages — via GitHub", items: langItems },
+    ...MANUAL_CATEGORIES,
+  ];
 
   return (
     <section
