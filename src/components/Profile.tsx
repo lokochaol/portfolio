@@ -101,7 +101,7 @@ export default function Profile() {
             >
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden border border-white/10">
                 <Image
-                  src="/portfolio/profile.jpg"
+                  src="/profile.jpg"
                   alt="廣岡 晃一"
                   width={144}
                   height={144}
