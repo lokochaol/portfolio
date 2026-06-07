@@ -11,7 +11,7 @@ import { getLanguageStats, getGitHubStats } from "@/lib/github";
 
 export default async function Page() {
   const githubLanguages = await getLanguageStats();
-  const githubStats = await getGitHubStats(githubLanguages);
+  const githubStats = await getGitHubStats();
 
   return (
     <main className="bg-[#080808] text-white min-h-screen cursor-none">

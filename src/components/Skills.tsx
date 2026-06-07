@@ -165,13 +165,12 @@ export default function Skills({ githubLanguages, githubStats }: Props) {
             initial={{ opacity: 0, y: 16 }}
             animate={visible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-16 border-t border-white/5 pt-10 grid grid-cols-2 sm:grid-cols-4 gap-6"
+            className="mt-16 border-t border-white/5 pt-10 grid grid-cols-3 gap-6"
           >
             {[
-              { label: "総コード量", value: formatLines(githubStats.totalLines) },
+              { label: "総コード量", value: formatLines(githubStats.linesChanged) },
               { label: "コミット数", value: formatCount(githubStats.commits) },
               { label: "マージPR", value: formatCount(githubStats.mergedPRs) },
-              { label: "リポジトリ", value: `${githubStats.repos}` },
             ].map(({ label, value }) => (
               <div key={label} className="space-y-1">
                 <p className="font-mono text-[10px] tracking-widest text-white/25 uppercase">{label}</p>

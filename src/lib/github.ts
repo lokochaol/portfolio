@@ -23,8 +23,7 @@ async function fetchAllRepos(): Promise<Repo[]> {
     const page: Repo[] = await res.json();
     repos.push(...page);
     const link = res.headers.get("link") ?? "";
-    const next = link.match(/<([^>]+)>;\s*rel="next"/)?.[1] ?? null;
-    url = next;
+    url = link.match(/<([^>]+)>;\s*rel="next"/)?.[1] ?? null;
   }
   return repos;
 }
@@ -36,11 +35,11 @@ export type LangStat = {
 };
 
 export type GitHubStats = {
-  totalLines: number;
+  linesChanged: number;
   commits: number;
   mergedPRs: number;
-  repos: number;
 };
+
 
 export async function getLanguageStats(): Promise<LangStat[]> {
   try {
@@ -84,10 +83,56 @@ export async function getLanguageStats(): Promise<LangStat[]> {
   }
 }
 
-async function searchCount(q: string): Promise<number> {
+type ContributorWeek = { a: number; d: number; c: number };
+type Contributor = { author: { login: string } | null; weeks: ContributorWeek[] };
+
+async function getLinesChangedForRepo(fullName: string): Promise<number> {
   try {
     const res = await fetch(
-      `https://api.github.com/search/commits?q=${encodeURIComponent(q)}&per_page=1`,
+      `https://api.github.com/repos/${fullName}/stats/contributors`,
+      { headers: HEADERS, next: { revalidate: 86400 } }
+    );
+    // 202 = GitHub is computing stats asynchronously; skip for now, available on next build
+    if (!res.ok || res.status === 202) return 0;
+    const data: Contributor[] = await res.json();
+    if (!Array.isArray(data)) return 0;
+    const mine = data.find((c) => c.author?.login === "lokochaol");
+    if (!mine) return 0;
+    return mine.weeks.reduce((sum, w) => sum + w.a + w.d, 0);
+  } catch {
+    return 0;
+  }
+}
+
+async function getMergedPRsForRepo(fullName: string): Promise<number> {
+  let count = 0;
+  let url: string | null =
+    `https://api.github.com/repos/${fullName}/pulls?state=closed&per_page=100`;
+  while (url) {
+    try {
+      const res: Response = await fetch(url, {
+        headers: HEADERS,
+        next: { revalidate: 86400 },
+      });
+      if (!res.ok) break;
+      const prs: Array<{ user: { login: string } | null; merged_at: string | null }> =
+        await res.json();
+      count += prs.filter(
+        (pr) => pr.user?.login === "lokochaol" && pr.merged_at
+      ).length;
+      const link = res.headers.get("link") ?? "";
+      url = link.match(/<([^>]+)>;\s*rel="next"/)?.[1] ?? null;
+    } catch {
+      break;
+    }
+  }
+  return count;
+}
+
+async function getCommitCount(): Promise<number> {
+  try {
+    const res = await fetch(
+      "https://api.github.com/search/commits?q=author:lokochaol&per_page=1",
       {
         headers: {
           ...HEADERS,
@@ -104,32 +149,22 @@ async function searchCount(q: string): Promise<number> {
   }
 }
 
-async function searchIssueCount(q: string): Promise<number> {
-  try {
-    const res = await fetch(
-      `https://api.github.com/search/issues?q=${encodeURIComponent(q)}&per_page=1`,
-      { headers: HEADERS, next: { revalidate: 86400 } }
-    );
-    if (!res.ok) return 0;
-    const data = await res.json();
-    return data.total_count ?? 0;
-  } catch {
-    return 0;
-  }
-}
-
-export async function getGitHubStats(langStats: LangStat[]): Promise<GitHubStats | null> {
+export async function getGitHubStats(): Promise<GitHubStats | null> {
   if (!process.env.GITHUB_TOKEN) return null;
   try {
-    const [repos, commits, mergedPRs] = await Promise.all([
-      fetchAllRepos().then((r) => r.filter((r) => !r.fork && !r.archived).length),
-      searchCount("author:lokochaol"),
-      searchIssueCount("is:pr is:merged author:lokochaol"),
+    const repos = await fetchAllRepos();
+    const allRepos = repos.filter((r) => !r.fork && !r.archived);
+
+    const [repoLines, repoMergedPRs, commits] = await Promise.all([
+      Promise.all(allRepos.map((r) => getLinesChangedForRepo(r.full_name))),
+      Promise.all(allRepos.map((r) => getMergedPRsForRepo(r.full_name))),
+      getCommitCount(),
     ]);
 
-    const totalLines = langStats.reduce((sum, l) => sum + l.lines, 0);
+    const linesChanged = repoLines.reduce((a, b) => a + b, 0);
+    const mergedPRs = repoMergedPRs.reduce((a, b) => a + b, 0);
 
-    return { totalLines, commits, mergedPRs, repos };
+    return { linesChanged, commits, mergedPRs };
   } catch (e) {
     console.warn("GitHub stats fetch failed:", e);
     return null;
