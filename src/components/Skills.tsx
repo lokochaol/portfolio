@@ -85,14 +85,7 @@ export default function Skills({ githubLanguages }: Props) {
               <div key={name} className="space-y-1.5">
                 <div className="flex justify-between items-baseline text-sm">
                   <span className="text-white/80">{name}</span>
-                  <div className="flex items-baseline gap-2">
-                    {lines > 0 && (
-                      <span className="font-mono text-white/20 text-[10px]">
-                        {formatLines(lines)}
-                      </span>
-                    )}
-                    <span className="font-mono text-white/30 text-xs">{level}%</span>
-                  </div>
+                  <span className="font-mono text-white/30 text-xs">{level}%</span>
                 </div>
                 <div className="h-px bg-white/10 relative overflow-hidden rounded-full">
                   <motion.div
@@ -102,6 +95,9 @@ export default function Skills({ githubLanguages }: Props) {
                     transition={{ duration: 1, delay: i * 0.08 + 0.3, ease: "easeOut" }}
                   />
                 </div>
+                {lines > 0 && (
+                  <p className="font-mono text-[10px] text-white/15">{formatLines(lines)}</p>
+                )}
               </div>
             ))}
           </motion.div>
