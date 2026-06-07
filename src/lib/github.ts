@@ -8,8 +8,6 @@ const BYTES_PER_LINE = 35;
 
 async function fetchAllRepos(): Promise<Repo[]> {
   const repos: Repo[] = [];
-  // /user/repos with type=all includes private repos and org repos the user is a member of
-  // Requires a token with `repo` scope
   const endpoint = process.env.GITHUB_TOKEN
     ? "https://api.github.com/user/repos?per_page=100&type=all"
     : "https://api.github.com/users/lokochaol/repos?per_page=100&type=owner";
@@ -24,8 +22,6 @@ async function fetchAllRepos(): Promise<Repo[]> {
     if (!res.ok) throw new Error(`repos fetch failed: ${res.status}`);
     const page: Repo[] = await res.json();
     repos.push(...page);
-
-    // follow Link header for pagination
     const link = res.headers.get("link") ?? "";
     const next = link.match(/<([^>]+)>;\s*rel="next"/)?.[1] ?? null;
     url = next;
@@ -35,8 +31,15 @@ async function fetchAllRepos(): Promise<Repo[]> {
 
 export type LangStat = {
   name: string;
-  level: number;      // percentage 0-100
-  lines: number;      // approximate line count
+  level: number;
+  lines: number;
+};
+
+export type GitHubStats = {
+  totalLines: number;
+  commits: number;
+  mergedPRs: number;
+  repos: number;
 };
 
 export async function getLanguageStats(): Promise<LangStat[]> {
@@ -59,7 +62,7 @@ export async function getLanguageStats(): Promise<LangStat[]> {
             totals[lang] = (totals[lang] ?? 0) + bytes;
           }
         } catch {
-          // skip repos that fail
+          // skip
         }
       })
     );
@@ -76,7 +79,59 @@ export async function getLanguageStats(): Promise<LangStat[]> {
         lines: Math.round(bytes / BYTES_PER_LINE),
       }));
   } catch (e) {
-    console.warn("GitHub language fetch failed, using fallback:", e);
+    console.warn("GitHub language fetch failed:", e);
     return [];
+  }
+}
+
+async function searchCount(q: string): Promise<number> {
+  try {
+    const res = await fetch(
+      `https://api.github.com/search/commits?q=${encodeURIComponent(q)}&per_page=1`,
+      {
+        headers: {
+          ...HEADERS,
+          Accept: "application/vnd.github.cloak-preview+json",
+        },
+        next: { revalidate: 86400 },
+      }
+    );
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.total_count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function searchIssueCount(q: string): Promise<number> {
+  try {
+    const res = await fetch(
+      `https://api.github.com/search/issues?q=${encodeURIComponent(q)}&per_page=1`,
+      { headers: HEADERS, next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.total_count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+export async function getGitHubStats(langStats: LangStat[]): Promise<GitHubStats | null> {
+  if (!process.env.GITHUB_TOKEN) return null;
+  try {
+    const [repos, commits, mergedPRs] = await Promise.all([
+      fetchAllRepos().then((r) => r.filter((r) => !r.fork && !r.archived).length),
+      searchCount("author:lokochaol"),
+      searchIssueCount("is:pr is:merged author:lokochaol"),
+    ]);
+
+    const totalLines = langStats.reduce((sum, l) => sum + l.lines, 0);
+
+    return { totalLines, commits, mergedPRs, repos };
+  } catch (e) {
+    console.warn("GitHub stats fetch failed:", e);
+    return null;
   }
 }
