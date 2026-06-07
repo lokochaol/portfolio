@@ -17,7 +17,7 @@ async function fetchAllRepos(): Promise<Repo[]> {
     const currentUrl = url;
     const res: Response = await fetch(currentUrl, {
       headers: HEADERS,
-      next: { revalidate: 86400 },
+      next: { revalidate: 3600 },
     });
     if (!res.ok) throw new Error(`repos fetch failed: ${res.status}`);
     const page: Repo[] = await res.json();
@@ -53,7 +53,7 @@ export async function getLanguageStats(): Promise<LangStat[]> {
         try {
           const r = await fetch(
             `https://api.github.com/repos/${repo.full_name}/languages`,
-            { headers: HEADERS, next: { revalidate: 86400 } }
+            { headers: HEADERS, next: { revalidate: 3600 } }
           );
           if (!r.ok) return;
           const langs: Record<string, number> = await r.json();
@@ -100,28 +100,28 @@ type Contributor = { author: { login: string } | null; weeks: ContributorWeek[] 
 
 async function getLinesChangedForRepo(fullName: string): Promise<number> {
   const url = `https://api.github.com/repos/${fullName}/stats/contributors`;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    try {
-      const res = await fetch(url, {
-        headers: HEADERS,
-        // no-store so retries bypass the Next.js fetch cache and hit GitHub fresh
-        cache: "no-store",
-      });
-      if (res.status === 202) {
-        await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
-        continue;
-      }
-      if (!res.ok) return 0;
-      const data: Contributor[] = await res.json();
-      if (!Array.isArray(data)) return 0;
-      const mine = data.find((c) => c.author?.login === "lokochaol");
-      if (!mine) return 0;
-      return mine.weeks.reduce((sum, w) => sum + w.a + w.d, 0);
-    } catch {
-      return 0;
+  try {
+    const res = await fetch(url, { headers: HEADERS, next: { revalidate: 3600 } });
+    if (res.status === 202) {
+      // GitHub is computing stats; wait 3s and try once more
+      await new Promise((r) => setTimeout(r, 3000));
+      const res2 = await fetch(url, { headers: HEADERS, next: { revalidate: 3600 } });
+      if (!res2.ok || res2.status === 202) return 0;
+      const data2: Contributor[] = await res2.json();
+      if (!Array.isArray(data2)) return 0;
+      const mine2 = data2.find((c) => c.author?.login === "lokochaol");
+      if (!mine2) return 0;
+      return mine2.weeks.reduce((sum, w) => sum + w.a + w.d, 0);
     }
+    if (!res.ok) return 0;
+    const data: Contributor[] = await res.json();
+    if (!Array.isArray(data)) return 0;
+    const mine = data.find((c) => c.author?.login === "lokochaol");
+    if (!mine) return 0;
+    return mine.weeks.reduce((sum, w) => sum + w.a + w.d, 0);
+  } catch {
+    return 0;
   }
-  return 0;
 }
 
 async function getMergedPRsForRepo(fullName: string): Promise<number> {
@@ -132,7 +132,7 @@ async function getMergedPRsForRepo(fullName: string): Promise<number> {
     try {
       const res: Response = await fetch(url, {
         headers: HEADERS,
-        next: { revalidate: 86400 },
+        next: { revalidate: 3600 },
       });
       if (!res.ok) break;
       const prs: Array<{ user: { login: string } | null; merged_at: string | null }> =
@@ -158,7 +158,7 @@ async function getCommitCount(): Promise<number> {
           ...HEADERS,
           Accept: "application/vnd.github.cloak-preview+json",
         },
-        next: { revalidate: 86400 },
+        next: { revalidate: 3600 },
       }
     );
     if (!res.ok) return 0;
