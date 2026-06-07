@@ -105,7 +105,7 @@ export default function Profile() {
                   alt="廣岡 晃一"
                   width={144}
                   height={144}
-                  className="w-full h-full object-cover grayscale"
+                  className="w-full h-full object-cover"
                   priority
                 />
               </div>
