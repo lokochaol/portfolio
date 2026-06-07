@@ -7,10 +7,11 @@ import About from "@/components/About";
 import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
-import { getLanguageStats } from "@/lib/github";
+import { getLanguageStats, getGitHubStats } from "@/lib/github";
 
 export default async function Page() {
   const githubLanguages = await getLanguageStats();
+  const githubStats = await getGitHubStats(githubLanguages);
 
   return (
     <main className="bg-[#080808] text-white min-h-screen cursor-none">
@@ -20,7 +21,7 @@ export default async function Page() {
       <Hero />
       <Profile />
       <About />
-      <Skills githubLanguages={githubLanguages} />
+      <Skills githubLanguages={githubLanguages} githubStats={githubStats} />
       <Projects />
       <Contact />
       <footer className="border-t border-white/5 py-8 text-center font-mono text-xs text-white/20">

@@ -2,57 +2,56 @@
 
 import { motion } from "framer-motion";
 import { useScrollReveal } from "./useScrollReveal";
+import type { LangStat, GitHubStats } from "@/lib/github";
 
-type LangItem = { name: string; level: number };
-
-const FALLBACK_LANGS: LangItem[] = [
-  { name: "Python", level: 95 },
-  { name: "Django / DRF", level: 90 },
-  { name: "PostgreSQL", level: 80 },
-  { name: "GitHub Actions", level: 75 },
+const FALLBACK_LANGS: LangStat[] = [
+  { name: "Python", level: 95, lines: 0 },
+  { name: "TypeScript", level: 72, lines: 0 },
+  { name: "JavaScript", level: 60, lines: 0 },
+  { name: "Dart", level: 40, lines: 0 },
 ];
 
-const MANUAL_CATEGORIES = [
-  {
-    category: "Infra / Cloud",
-    items: [
-      { name: "AWS EC2/ECS/Lambda", level: 70 },
-      { name: "GCP GCS", level: 65 },
-      { name: "Docker", level: 78 },
-      { name: "Ubuntu / Linux", level: 72 },
-    ],
-  },
-  {
-    category: "Frontend / Mobile",
-    items: [
-      { name: "React / Vue.js", level: 68 },
-      { name: "TypeScript", level: 65 },
-      { name: "Flutter", level: 65 },
-      { name: "Figma", level: 70 },
-    ],
-  },
+const INFRA_TAGS = [
+  "AWS EC2 / ECS / Lambda",
+  "GCP GCS",
+  "Docker",
+  "Ubuntu / Linux",
+  "GitHub Actions",
+  "MAAS",
+  "PostgreSQL",
+  "Guacamole",
 ];
+
+const MOBILE_PLATFORMS = ["Android", "iOS", "Web"];
+const DESIGN_TOOLS = ["Figma"];
+
+function formatLines(n: number): string {
+  if (n >= 10000) return `${(n / 10000).toFixed(1)}万行`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k行`;
+  return `${n}行`;
+}
+
+function formatCount(n: number): string {
+  if (n >= 10000) return `${(n / 10000).toFixed(1)}万`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return `${n}`;
+}
 
 type Props = {
-  githubLanguages?: LangItem[];
+  githubLanguages?: LangStat[];
+  githubStats?: GitHubStats | null;
 };
 
-export default function Skills({ githubLanguages }: Props) {
+export default function Skills({ githubLanguages, githubStats }: Props) {
   const { ref, visible } = useScrollReveal();
-
-  const langItems =
-    githubLanguages && githubLanguages.length > 0 ? githubLanguages : FALLBACK_LANGS;
-
-  const skills = [
-    { category: "Languages — via GitHub", items: langItems },
-    ...MANUAL_CATEGORIES,
-  ];
+  const fromGitHub = githubLanguages && githubLanguages.length > 0;
+  const langItems = fromGitHub ? githubLanguages : FALLBACK_LANGS;
 
   return (
     <section
       id="skills"
       ref={ref as React.RefObject<HTMLElement>}
-      className="min-h-screen flex items-center px-6 py-24 bg-white/[0.02]"
+      className="flex items-center px-6 py-24 bg-white/[0.02]"
     >
       <div className="max-w-5xl mx-auto w-full">
         <motion.div
@@ -66,36 +65,121 @@ export default function Skills({ githubLanguages }: Props) {
         </motion.div>
 
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-10">
-          {skills.map(({ category, items }, ci) => (
-            <motion.div
-              key={category}
-              initial={{ opacity: 0, y: 30 }}
-              animate={visible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: ci * 0.15 }}
-              className="space-y-6"
-            >
-              <h3 className="font-mono text-xs tracking-widest text-white/40 uppercase border-b border-white/10 pb-3">
-                {category}
-              </h3>
-              {items.map(({ name, level }, i) => (
-                <div key={name} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/80">{name}</span>
-                    <span className="font-mono text-white/30 text-xs">{level}%</span>
-                  </div>
-                  <div className="h-px bg-white/10 relative overflow-hidden rounded-full">
-                    <motion.div
-                      className="absolute top-0 left-0 h-full bg-white/60"
-                      initial={{ width: 0 }}
-                      animate={visible ? { width: `${level}%` } : {}}
-                      transition={{ duration: 1, delay: ci * 0.15 + i * 0.08 + 0.3, ease: "easeOut" }}
-                    />
-                  </div>
+          {/* Languages — GitHub bars */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={visible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7 }}
+            className="space-y-6"
+          >
+            <h3 className="font-mono text-xs tracking-widest text-white/40 uppercase border-b border-white/10 pb-3 flex justify-between">
+              <span>Languages</span>
+              {fromGitHub && <span className="text-white/20 normal-case tracking-normal">via GitHub</span>}
+            </h3>
+            {langItems.map(({ name, level, lines }, i) => (
+              <div key={name} className="space-y-1.5">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-white/80">{name}</span>
+                  <span className="font-mono text-white/30 text-xs">{level}%</span>
                 </div>
+                <div className="h-px bg-white/10 relative overflow-hidden rounded-full">
+                  <motion.div
+                    className="absolute top-0 left-0 h-full bg-white/60"
+                    initial={{ width: 0 }}
+                    animate={visible ? { width: `${level}%` } : {}}
+                    transition={{ duration: 1, delay: i * 0.08 + 0.3, ease: "easeOut" }}
+                  />
+                </div>
+                {lines > 0 && (
+                  <p className="font-mono text-[10px] text-white/15">{formatLines(lines)}</p>
+                )}
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Infra / Cloud — tags */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={visible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="space-y-6"
+          >
+            <h3 className="font-mono text-xs tracking-widest text-white/40 uppercase border-b border-white/10 pb-3">
+              Infra / Cloud
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {INFRA_TAGS.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-mono text-xs text-white/50 border border-white/10 rounded px-2.5 py-1 hover:border-white/30 hover:text-white/80 transition-colors"
+                >
+                  {tag}
+                </span>
               ))}
-            </motion.div>
-          ))}
+            </div>
+          </motion.div>
+
+          {/* Mobile & Design — grouped */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={visible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="space-y-8"
+          >
+            <div className="space-y-4">
+              <h3 className="font-mono text-xs tracking-widest text-white/40 uppercase border-b border-white/10 pb-3">
+                Mobile
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {MOBILE_PLATFORMS.map((p) => (
+                  <span
+                    key={p}
+                    className="font-mono text-xs text-white/50 border border-white/10 rounded px-2.5 py-1 hover:border-white/30 hover:text-white/80 transition-colors"
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="font-mono text-xs tracking-widest text-white/40 uppercase border-b border-white/10 pb-3">
+                Design
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {DESIGN_TOOLS.map((t) => (
+                  <span
+                    key={t}
+                    className="font-mono text-xs text-white/50 border border-white/10 rounded px-2.5 py-1 hover:border-white/30 hover:text-white/80 transition-colors"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
+
+        {/* GitHub Stats banner */}
+        {githubStats && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={visible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-16 border-t border-white/5 pt-10 grid grid-cols-2 sm:grid-cols-4 gap-6"
+          >
+            {[
+              { label: "総コード量", value: formatLines(githubStats.totalLines) },
+              { label: "コミット数", value: formatCount(githubStats.commits) },
+              { label: "マージPR", value: formatCount(githubStats.mergedPRs) },
+              { label: "リポジトリ", value: `${githubStats.repos}` },
+            ].map(({ label, value }) => (
+              <div key={label} className="space-y-1">
+                <p className="font-mono text-[10px] tracking-widest text-white/25 uppercase">{label}</p>
+                <p className="text-2xl font-bold text-white/80">{value}</p>
+              </div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );
