@@ -6,24 +6,17 @@ import { useScrollReveal } from "./useScrollReveal";
 const projects = [
   {
     number: "01",
-    title: "Project Alpha",
-    description: "FastAPI + PostgreSQL で構築した REST API サービス。認証・認可・レート制限を含む本番グレードの設計。",
-    tags: ["FastAPI", "PostgreSQL", "Docker", "Python"],
-    link: "#",
+    title: "monote",
+    description: "iOS向けメモアプリ。App Storeにてリリース済み。",
+    tags: ["iOS", "Swift", "App Store"],
+    link: "https://apps.apple.com/jp/app/monote/id6762173359",
   },
   {
     number: "02",
-    title: "Project Beta",
-    description: "Django + React のフルスタック Web アプリ。リアルタイム機能に WebSocket を採用。",
-    tags: ["Django", "React", "WebSocket", "TypeScript"],
-    link: "#",
-  },
-  {
-    number: "03",
-    title: "Project Gamma",
-    description: "Flutter で開発したクロスプラットフォームモバイルアプリ。iOS / Android に同時対応。",
-    tags: ["Flutter", "Dart", "Firebase"],
-    link: "#",
+    title: "Portfolio",
+    description: "このポートフォリオサイト。Three.js パーティクル背景・Framer Motion スクロールアニメーション・GitHub API 連携を実装。",
+    tags: ["Next.js", "TypeScript", "Three.js", "Framer Motion"],
+    link: "https://github.com/lokochaol/portfolio",
   },
 ];
 
