@@ -8,9 +8,7 @@ const BYTES_PER_LINE = 35;
 
 async function fetchAllRepos(): Promise<Repo[]> {
   const repos: Repo[] = [];
-  const endpoint = process.env.GITHUB_TOKEN
-    ? "https://api.github.com/user/repos?per_page=100&type=all"
-    : "https://api.github.com/users/lokochaol/repos?per_page=100&type=owner";
+  const endpoint = "https://api.github.com/users/lokochaol/repos?per_page=100&type=owner";
 
   let url: string | null = endpoint;
   while (url) {
