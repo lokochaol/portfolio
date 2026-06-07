@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useScrollReveal } from "./useScrollReveal";
 
@@ -89,16 +90,41 @@ export default function Profile() {
           <span className="font-mono text-xs tracking-widest text-white/30 uppercase">
             00 / Profile
           </span>
-          <div className="mt-4 flex flex-wrap items-baseline gap-4">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">廣岡 晃一</h2>
-            <span className="font-mono text-sm text-white/30">Hirooka Koichi · 23歳</span>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-8 sm:gap-12 items-start">
+            {/* Photo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={visible ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="shrink-0"
+            >
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden border border-white/10">
+                <Image
+                  src="/portfolio/profile.jpg"
+                  alt="廣岡 晃一"
+                  width={144}
+                  height={144}
+                  className="w-full h-full object-cover grayscale"
+                  priority
+                />
+              </div>
+            </motion.div>
+
+            {/* Name + bio */}
+            <div>
+              <div className="flex flex-wrap items-baseline gap-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-white">廣岡 晃一</h2>
+                <span className="font-mono text-sm text-white/30">Hirooka Koichi · 23歳</span>
+              </div>
+              <p className="mt-6 text-white/50 text-sm leading-8 max-w-2xl">
+                バックエンド開発（Python / Django / DRF）を中心に、インフラ（AWS / GCP）、
+                フロントエンド（React / Vue.js）、モバイル（iOS / Android）まで幅広く対応するフルスタックエンジニアです。
+                RESTful APIの設計から実装・テスト・ドキュメント作成まで一貫して担当しています。
+                テックリードとして技術方針策定・コードレビュー・進捗報告も経験しています。
+              </p>
+            </div>
           </div>
-          <p className="mt-6 text-white/50 text-sm leading-8 max-w-2xl">
-            バックエンド開発（Python / Django / DRF）を中心に、インフラ（AWS / GCP）、
-            フロントエンド（React / Vue.js）、モバイル（iOS / Android）まで幅広く対応するフルスタックエンジニアです。
-            RESTful APIの設計から実装・テスト・ドキュメント作成まで一貫して担当しています。
-            テックリードとして技術方針策定・コードレビュー・進捗報告も経験しています。
-          </p>
         </motion.div>
 
         {/* Timeline */}
