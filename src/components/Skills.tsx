@@ -128,7 +128,7 @@ export default function Skills({ githubLanguages, githubStats }: Props) {
           >
             <div className="space-y-4">
               <h3 className="font-mono text-xs tracking-widest text-white/40 uppercase border-b border-white/10 pb-3">
-                Mobile
+                Platform
               </h3>
               <div className="flex flex-wrap gap-2">
                 {MOBILE_PLATFORMS.map((p) => (
