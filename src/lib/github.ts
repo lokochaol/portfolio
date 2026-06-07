@@ -87,21 +87,26 @@ type ContributorWeek = { a: number; d: number; c: number };
 type Contributor = { author: { login: string } | null; weeks: ContributorWeek[] };
 
 async function getLinesChangedForRepo(fullName: string): Promise<number> {
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${fullName}/stats/contributors`,
-      { headers: HEADERS, next: { revalidate: 86400 } }
-    );
-    // 202 = GitHub is computing stats asynchronously; skip for now, available on next build
-    if (!res.ok || res.status === 202) return 0;
-    const data: Contributor[] = await res.json();
-    if (!Array.isArray(data)) return 0;
-    const mine = data.find((c) => c.author?.login === "lokochaol");
-    if (!mine) return 0;
-    return mine.weeks.reduce((sum, w) => sum + w.a + w.d, 0);
-  } catch {
-    return 0;
+  const url = `https://api.github.com/repos/${fullName}/stats/contributors`;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const res = await fetch(url, { headers: HEADERS, next: { revalidate: 86400 } });
+      if (res.status === 202) {
+        // GitHub is computing stats; wait and retry
+        await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+        continue;
+      }
+      if (!res.ok) return 0;
+      const data: Contributor[] = await res.json();
+      if (!Array.isArray(data)) return 0;
+      const mine = data.find((c) => c.author?.login === "lokochaol");
+      if (!mine) return 0;
+      return mine.weeks.reduce((sum, w) => sum + w.a + w.d, 0);
+    } catch {
+      return 0;
+    }
   }
+  return 0;
 }
 
 async function getMergedPRsForRepo(fullName: string): Promise<number> {

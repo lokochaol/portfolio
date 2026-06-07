@@ -168,7 +168,7 @@ export default function Skills({ githubLanguages, githubStats }: Props) {
             className="mt-16 border-t border-white/5 pt-10 grid grid-cols-3 gap-6"
           >
             {[
-              { label: "総コード量", value: formatLines(githubStats.linesChanged) },
+              { label: "総編集コード量", value: formatLines(githubStats.linesChanged) },
               { label: "コミット数", value: formatCount(githubStats.commits) },
               { label: "マージPR", value: formatCount(githubStats.mergedPRs) },
             ].map(({ label, value }) => (
