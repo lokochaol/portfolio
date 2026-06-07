@@ -66,6 +66,18 @@ export async function getLanguageStats(): Promise<LangStat[]> {
       })
     );
 
+    const EXCLUDE = new Set([
+      "Jupyter Notebook",
+      "HTML", "CSS", "SCSS", "Less",
+      "SVG", "Markdown",
+      "Makefile", "CMake", "Meson",
+      "Dockerfile",
+      "Shell", "Batchfile", "PowerShell",
+    ]);
+    for (const key of Object.keys(totals)) {
+      if (EXCLUDE.has(key)) delete totals[key];
+    }
+
     const totalBytes = Object.values(totals).reduce((a, b) => a + b, 0);
     if (totalBytes === 0) return [];
 
