@@ -73,6 +73,7 @@ export async function getLanguageStats(): Promise<LangStat[]> {
       "Makefile", "CMake", "Meson",
       "Dockerfile",
       "Shell", "Batchfile", "PowerShell",
+      "PHP",
     ]);
     for (const key of Object.keys(totals)) {
       if (EXCLUDE.has(key)) delete totals[key];
