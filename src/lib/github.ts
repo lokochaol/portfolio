@@ -102,9 +102,12 @@ async function getLinesChangedForRepo(fullName: string): Promise<number> {
   const url = `https://api.github.com/repos/${fullName}/stats/contributors`;
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      const res = await fetch(url, { headers: HEADERS, next: { revalidate: 86400 } });
+      const res = await fetch(url, {
+        headers: HEADERS,
+        // no-store so retries bypass the Next.js fetch cache and hit GitHub fresh
+        cache: "no-store",
+      });
       if (res.status === 202) {
-        // GitHub is computing stats; wait and retry
         await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
         continue;
       }
