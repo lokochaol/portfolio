@@ -4,7 +4,6 @@ const HEADERS: HeadersInit = process.env.GITHUB_TOKEN
   ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
   : {};
 
-const BYTES_PER_LINE = 35;
 
 async function fetchAllRepos(): Promise<Repo[]> {
   const repos: Repo[] = [];
@@ -31,7 +30,6 @@ async function fetchAllRepos(): Promise<Repo[]> {
 export type LangStat = {
   name: string;
   level: number;
-  lines: number;
 };
 
 export type GitHubStats = {
@@ -88,7 +86,6 @@ export async function getLanguageStats(): Promise<LangStat[]> {
       .map(([name, bytes]) => ({
         name,
         level: Math.round((bytes / totalBytes) * 100),
-        lines: Math.round(bytes / BYTES_PER_LINE),
       }));
   } catch (e) {
     console.warn("GitHub language fetch failed:", e);

@@ -5,10 +5,10 @@ import { useScrollReveal } from "./useScrollReveal";
 import type { LangStat, GitHubStats } from "@/lib/github";
 
 const FALLBACK_LANGS: LangStat[] = [
-  { name: "Python", level: 95, lines: 0 },
-  { name: "TypeScript", level: 72, lines: 0 },
-  { name: "JavaScript", level: 60, lines: 0 },
-  { name: "Dart", level: 40, lines: 0 },
+  { name: "Python", level: 95 },
+  { name: "TypeScript", level: 72 },
+  { name: "JavaScript", level: 60 },
+  { name: "Dart", level: 40 },
 ];
 
 const INFRA_TAGS = [
@@ -76,25 +76,30 @@ export default function Skills({ githubLanguages, githubStats }: Props) {
               <span>Languages</span>
               {fromGitHub && <span className="text-white/20 normal-case tracking-normal">via GitHub</span>}
             </h3>
-            {langItems.map(({ name, level, lines }, i) => (
-              <div key={name} className="space-y-1.5">
-                <div className="flex justify-between items-baseline text-sm">
-                  <span className="text-white/80">{name}</span>
-                  <span className="font-mono text-white/30 text-xs">{level}%</span>
+            {langItems.map(({ name, level }, i) => {
+              const lines = githubStats
+                ? Math.round((level / 100) * githubStats.linesChanged)
+                : 0;
+              return (
+                <div key={name} className="space-y-1.5">
+                  <div className="flex justify-between items-baseline text-sm">
+                    <span className="text-white/80">{name}</span>
+                    <span className="font-mono text-white/30 text-xs">{level}%</span>
+                  </div>
+                  <div className="h-px bg-white/10 relative overflow-hidden rounded-full">
+                    <motion.div
+                      className="absolute top-0 left-0 h-full bg-white/60"
+                      initial={{ width: 0 }}
+                      animate={visible ? { width: `${level}%` } : {}}
+                      transition={{ duration: 1, delay: i * 0.08 + 0.3, ease: "easeOut" }}
+                    />
+                  </div>
+                  {lines > 0 && (
+                    <p className="font-mono text-[10px] text-white/15">{formatLines(lines)}</p>
+                  )}
                 </div>
-                <div className="h-px bg-white/10 relative overflow-hidden rounded-full">
-                  <motion.div
-                    className="absolute top-0 left-0 h-full bg-white/60"
-                    initial={{ width: 0 }}
-                    animate={visible ? { width: `${level}%` } : {}}
-                    transition={{ duration: 1, delay: i * 0.08 + 0.3, ease: "easeOut" }}
-                  />
-                </div>
-                {lines > 0 && (
-                  <p className="font-mono text-[10px] text-white/15">{formatLines(lines)}</p>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </motion.div>
 
           {/* Infra / Cloud — tags */}
