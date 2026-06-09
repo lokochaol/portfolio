@@ -39,67 +39,24 @@ export type GitHubStats = {
 };
 
 
-const LANG_EXCLUDE = new Set([
-  "Jupyter Notebook",
-  "HTML", "CSS", "SCSS", "Less",
-  "SVG", "Markdown",
-  "Makefile", "CMake", "Meson",
-  "Dockerfile",
-  "Shell", "Batchfile", "PowerShell",
-  "PHP",
-]);
-
-async function getContribRatioForRepo(fullName: string): Promise<number> {
-  const url = `https://api.github.com/repos/${fullName}/stats/contributors`;
-  try {
-    const res = await fetch(url, { headers: HEADERS, next: { revalidate: 3600 } });
-    if (res.status === 202) {
-      await new Promise((r) => setTimeout(r, 3000));
-      const res2 = await fetch(url, { headers: HEADERS, next: { revalidate: 3600 } });
-      if (!res2.ok || res2.status === 202) return 1;
-      const data2: Contributor[] = await res2.json();
-      return calcRatio(data2);
-    }
-    if (!res.ok) return 1;
-    const data: Contributor[] = await res.json();
-    return calcRatio(data);
-  } catch {
-    return 1;
-  }
-}
-
-function calcRatio(contribs: Contributor[]): number {
-  if (!Array.isArray(contribs) || contribs.length === 0) return 1;
-  const sumLines = (c: Contributor) => c.weeks.reduce((s, w) => s + w.a + w.d, 0);
-  const total = contribs.reduce((s, c) => s + sumLines(c), 0);
-  if (total === 0) return 0;
-  const mine = contribs.find((c) => c.author?.login === "lokochaol");
-  return mine ? sumLines(mine) / total : 0;
-}
-
 export async function getLanguageStats(): Promise<LangStat[]> {
   try {
     const repos = await fetchAllRepos();
-    const candidateRepos = repos.filter((r) => !r.fork && !r.archived);
+    const ownRepos = repos.filter((r) => !r.fork && !r.archived);
 
-    const weightedTotals: Record<string, number> = {};
+    const totals: Record<string, number> = {};
 
     await Promise.all(
-      candidateRepos.map(async (repo) => {
+      ownRepos.map(async (repo) => {
         try {
-          const [langRes, ratio] = await Promise.all([
-            fetch(`https://api.github.com/repos/${repo.full_name}/languages`, {
-              headers: HEADERS,
-              next: { revalidate: 3600 },
-            }),
-            getContribRatioForRepo(repo.full_name),
-          ]);
-          if (!langRes.ok || ratio === 0) return;
-          const langs: Record<string, number> = await langRes.json();
+          const r = await fetch(
+            `https://api.github.com/repos/${repo.full_name}/languages`,
+            { headers: HEADERS, next: { revalidate: 3600 } }
+          );
+          if (!r.ok) return;
+          const langs: Record<string, number> = await r.json();
           for (const [lang, bytes] of Object.entries(langs)) {
-            if (!LANG_EXCLUDE.has(lang)) {
-              weightedTotals[lang] = (weightedTotals[lang] ?? 0) + bytes * ratio;
-            }
+            totals[lang] = (totals[lang] ?? 0) + bytes;
           }
         } catch {
           // skip
@@ -107,15 +64,28 @@ export async function getLanguageStats(): Promise<LangStat[]> {
       })
     );
 
-    const totalWeighted = Object.values(weightedTotals).reduce((a, b) => a + b, 0);
-    if (totalWeighted === 0) return [];
+    const EXCLUDE = new Set([
+      "Jupyter Notebook",
+      "HTML", "CSS", "SCSS", "Less",
+      "SVG", "Markdown",
+      "Makefile", "CMake", "Meson",
+      "Dockerfile",
+      "Shell", "Batchfile", "PowerShell",
+      "PHP",
+    ]);
+    for (const key of Object.keys(totals)) {
+      if (EXCLUDE.has(key)) delete totals[key];
+    }
 
-    return Object.entries(weightedTotals)
+    const totalBytes = Object.values(totals).reduce((a, b) => a + b, 0);
+    if (totalBytes === 0) return [];
+
+    return Object.entries(totals)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 8)
       .map(([name, bytes]) => ({
         name,
-        level: Math.round((bytes / totalWeighted) * 100),
+        level: Math.round((bytes / totalBytes) * 100),
       }));
   } catch (e) {
     console.warn("GitHub language fetch failed:", e);
