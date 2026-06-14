@@ -122,29 +122,18 @@ async function getLinesChangedForRepo(fullName: string): Promise<number> {
   }
 }
 
-async function getMergedPRsForRepo(fullName: string): Promise<number> {
-  let count = 0;
-  let url: string | null =
-    `https://api.github.com/repos/${fullName}/pulls?state=closed&per_page=100`;
-  while (url) {
-    try {
-      const res: Response = await fetch(url, {
-        headers: HEADERS,
-        next: { revalidate: 3600 },
-      });
-      if (!res.ok) break;
-      const prs: Array<{ user: { login: string } | null; merged_at: string | null }> =
-        await res.json();
-      count += prs.filter(
-        (pr) => pr.user?.login === "lokochaol" && pr.merged_at
-      ).length;
-      const link = res.headers.get("link") ?? "";
-      url = link.match(/<([^>]+)>;\s*rel="next"/)?.[1] ?? null;
-    } catch {
-      break;
-    }
+async function getTotalMergedPRs(): Promise<number> {
+  try {
+    const res = await fetch(
+      "https://api.github.com/search/issues?q=is:pr+is:merged+author:lokochaol&per_page=1",
+      { headers: HEADERS, next: { revalidate: 3600 } }
+    );
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.total_count ?? 0;
+  } catch {
+    return 0;
   }
-  return count;
 }
 
 async function getCommitCount(): Promise<number> {
@@ -173,14 +162,13 @@ export async function getGitHubStats(): Promise<GitHubStats | null> {
     const repos = await fetchAllRepos();
     const allRepos = repos.filter((r) => !r.fork && !r.archived);
 
-    const [repoLines, repoMergedPRs, commits] = await Promise.all([
+    const [repoLines, mergedPRs, commits] = await Promise.all([
       Promise.all(allRepos.map((r) => getLinesChangedForRepo(r.full_name))),
-      Promise.all(allRepos.map((r) => getMergedPRsForRepo(r.full_name))),
+      getTotalMergedPRs(),
       getCommitCount(),
     ]);
 
     const linesChanged = repoLines.reduce((a, b) => a + b, 0);
-    const mergedPRs = repoMergedPRs.reduce((a, b) => a + b, 0);
 
     return { linesChanged, commits, mergedPRs };
   } catch (e) {
