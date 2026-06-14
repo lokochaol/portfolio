@@ -9,14 +9,16 @@ const BASE_URL = "https://koichi.hirooka.me/portfolio";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "廣岡晃一（Hirooka Koichi）| バックエンドエンジニア",
+    default: "廣岡晃一 | フリーランスエンジニア・ポートフォリオ",
     template: "%s | 廣岡晃一",
   },
   description:
-    "廣岡晃一（Hirooka Koichi）のポートフォリオ。Python・Django・DRF を主軸としたバックエンドエンジニア。REST API 設計、OCR パイプライン、AWS インフラ構築、Flutter モバイル開発まで対応可能なフルサイクルエンジニア。東京理科大学・大阪芸術大学通信教育部・42Tokyo 出身。",
+    "廣岡晃一（Koichi Hirooka）のポートフォリオ。Python/Django・Flutter・AWS を得意とするフリーランスエンジニア。REST API 設計、AWS インフラ構築、Flutter モバイル開発まで対応。",
   keywords: [
     "廣岡晃一",
-    "Backend Engineer",
+    "Koichi Hirooka",
+    "k.hirooka",
+    "フリーランスエンジニア",
     "バックエンドエンジニア",
     "Python",
     "Django",
@@ -33,17 +35,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: BASE_URL,
-    title: "廣岡晃一 | Backend Engineer",
+    title: "廣岡晃一 Portfolio",
     description:
-      "Python・Django・DRF を主軸としたバックエンドエンジニアのポートフォリオ。REST API 設計からインフラ・モバイルまで対応。",
+      "廣岡晃一（Koichi Hirooka）のポートフォリオ。Python/Django・Flutter・AWS を得意とするフリーランスエンジニア。",
     siteName: "廣岡晃一 Portfolio",
     locale: "ja_JP",
   },
   twitter: {
     card: "summary_large_image",
-    title: "廣岡晃一 | Backend Engineer",
+    title: "廣岡晃一 Portfolio",
     description:
-      "Python・Django・DRF を主軸としたバックエンドエンジニアのポートフォリオ。",
+      "廣岡晃一（Koichi Hirooka）のポートフォリオ。Python/Django・Flutter・AWS を得意とするフリーランスエンジニア。",
   },
   alternates: {
     canonical: BASE_URL,
