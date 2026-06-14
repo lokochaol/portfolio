@@ -13,12 +13,12 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "廣岡晃一",
-  alternateName: ["Hirooka Koichi", "廣岡 晃一"],
+  alternateName: ["Koichi Hirooka", "k.hirooka", "廣岡 晃一", "Hirooka Koichi"],
   url: "https://koichi.hirooka.me/portfolio",
   image: "https://koichi.hirooka.me/portfolio/profile.jpg",
-  jobTitle: "バックエンドエンジニア",
+  jobTitle: "フリーランスエンジニア",
   description:
-    "Python・Django・DRF を主軸としたバックエンドエンジニア。AWS / GCP のインフラ構築、React / Vue.js のフロントエンド、Flutter モバイル開発まで対応するフルサイクルエンジニア。",
+    "廣岡晃一（Koichi Hirooka）のポートフォリオ。Python/Django・Flutter・AWS を得意とするフリーランスエンジニア。REST API 設計、AWS インフラ構築、Flutter モバイル開発まで対応。",
   email: "l.00.kocha.00.l@gmail.com",
   knowsAbout: [
     "Python",
