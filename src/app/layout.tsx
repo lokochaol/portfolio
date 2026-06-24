@@ -4,7 +4,7 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-const BASE_URL = "https://koichi.hirooka.me/portfolio";
+const BASE_URL = "https://koichi.hirooka.me/portfolio/";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
