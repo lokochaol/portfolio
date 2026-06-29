@@ -14,7 +14,7 @@ const jsonLd = {
   "@type": "Person",
   name: "廣岡晃一",
   alternateName: ["Koichi Hirooka", "k.hirooka", "廣岡 晃一", "Hirooka Koichi"],
-  url: "https://koichi.hirooka.me/portfolio",
+  url: "https://koichi.hirooka.me/portfolio/",
   image: "https://koichi.hirooka.me/portfolio/profile.jpg",
   jobTitle: "フリーランスエンジニア",
   description:
