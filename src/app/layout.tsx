@@ -4,10 +4,15 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-const BASE_URL = "https://koichi.hirooka.me/portfolio/";
+// Canonical URL has no trailing slash. The site redirects /portfolio/ -> /portfolio
+// (trailingSlash: false), so the indexable 200 page is the slash-less form.
+const CANONICAL_URL = "https://koichi.hirooka.me/portfolio";
+// metadataBase keeps a trailing slash so relative metadata (e.g. the generated
+// Open Graph image) resolves under /portfolio/ instead of the domain root.
+const METADATA_BASE = "https://koichi.hirooka.me/portfolio/";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(METADATA_BASE),
   title: {
     default: "廣岡晃一 | フリーランスエンジニア・ポートフォリオ",
     template: "%s | 廣岡晃一",
@@ -30,11 +35,11 @@ export const metadata: Metadata = {
     "ポートフォリオ",
     "フルサイクルエンジニア",
   ],
-  authors: [{ name: "廣岡晃一", url: BASE_URL }],
+  authors: [{ name: "廣岡晃一", url: CANONICAL_URL }],
   creator: "廣岡晃一",
   openGraph: {
     type: "website",
-    url: BASE_URL,
+    url: CANONICAL_URL,
     title: "廣岡晃一 Portfolio",
     description:
       "廣岡晃一（Koichi Hirooka）のポートフォリオ。Python/Django・Flutter・AWS を得意とするフリーランスエンジニア。",
@@ -48,7 +53,7 @@ export const metadata: Metadata = {
       "廣岡晃一（Koichi Hirooka）のポートフォリオ。Python/Django・Flutter・AWS を得意とするフリーランスエンジニア。",
   },
   alternates: {
-    canonical: BASE_URL,
+    canonical: CANONICAL_URL,
   },
   robots: {
     index: true,
